@@ -1,0 +1,204 @@
+* {
+    box-sizing: border-box;
+    font-family: 'Rubik', sans-serif;
+  }
+  
+  body, html {
+    height: 100vh;
+  }
+
+  .login {
+    /* display: none; */
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+    background: rgba(25,25,25,0.7);
+    z-index: 2;
+  }
+  
+  .chart {
+    width: 400px;
+    margin: 200px auto 0;
+    padding: 10px;
+    height: 210px;
+    background: red;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+
+  }
+  
+  .chart h3 {
+    margin: 40px 0;
+  }
+  
+  .chart input[type=text] {
+    display: block;
+    width: 80%;  
+    margin: 10px auto;
+  }
+  
+  .chart button {
+    display: block;
+    height: 25px;
+    width:50px;
+    margin: 20px auto;
+    border-radius: 5px;
+  }
+  
+  html {
+    height: 100%;
+  }
+  
+  body {
+    font-size: 14px;
+    height: 100%;
+  }
+  
+  .mainbox {
+    display: flex;
+    max-width: 1000px;
+    min-height: 750px;
+    height: 100%;
+    margin: 20px auto;
+  }
+  
+  .contacts {
+    display: inline-block;
+    background-color: #343a40;
+    width: 270px;
+    height: 750px;
+  }
+  
+  .contacts .user {
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .contacts .user .state {
+    font-size: 0.6rem;
+    color: lightgrey;
+    padding: 10px 10px 10px 20px;
+  }
+  
+  .contacts .user .name {
+    display: inline-block;
+    font-size: 0.9rem;
+    color: lightgrey;
+  }
+  
+  .contacts .user .fa-ellipsis-v {  
+    position: absolute;
+    margin-top: 15px; 
+    right: 20px;
+    font-size: 0.9rem;
+    color: white;
+  }
+  
+  /* Active User */
+  
+  .user.active {
+    background-color: #007bff; 
+  }
+  
+  .user.active i.fa-circle {
+    background-color: rgb(24, 255, 24); 
+    color:rgb(24, 255, 24); 
+    border-radius: 50%; 
+  }
+  
+  .user.active .name {
+    font-weight: 500;
+    color: white;
+  }
+  
+  .conversation {
+    display: inline-block;
+    height: 750px;
+    width: 100%;
+  }
+  
+  .conversation .close-chat {
+    height: 5%;
+    border: 1px solid lightgray;
+    border-bottom: none;
+    color: gray;
+  }
+  
+  .conversation .close-chat p {
+    font-size: 0.8rem;
+    padding: 10px 20px;
+    text-align: right;
+    margin: 0;
+  }
+  
+  .conversation .chat {
+    height: 85%;
+    width: 100%;
+    overflow-y: scroll;
+    border: 1px solid lightgray;
+    border-bottom: none;
+  }
+  
+  .conversation .chat .message {
+    padding-bottom: 5px; 
+    margin-left: 10px;
+    height: 50px;
+  }
+  
+  .conversation .chat .message .title {  
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: gray;
+    margin: 20px 10px 10px;
+  }
+  
+  .conversation .chat .message .title span{
+    font-weight: 400;
+    padding: 5px;
+    font-size: 0.8rem;
+    color: gray;
+  }
+  
+  .conversation .chat .message .text {  
+    font-size: 0.9rem;
+    margin: 0 10px 10px;
+  }
+
+  .conected {
+    padding: 5px;
+    margin: 0 13px 10px;
+    font-size: 0.8rem;
+    color: gray;
+
+  }
+  
+  .conversation .type-zone {
+    display: flex;
+    height: 10%;
+    width: 100%;
+    border: 1px solid lightgray;
+    justify-content: center;
+  }
+  
+  .conversation .type-zone .send{
+    margin-top: 10px;
+    width: 95%;
+    height: 40px;
+    padding: 7px 10px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    text-align: left;
+  }
+  
+  .conversation .type-zone i {
+    display: block;
+    position: relative;
+    top: 22px;
+    right: 30px;
+    color: gray;
+    font-size: 1rem;
+  }
