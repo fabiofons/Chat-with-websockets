@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">  
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChatBox</title>
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">  
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css?family=Rubik:400,500,700&display=swap" rel="stylesheet">
   <link href="public/style.css" rel="stylesheet" type="text/css"/>
 </head>
@@ -33,21 +33,20 @@
           <div class="message">
             <p class="title">
               <%= msg.user %> <span><%= msg.date %></span>
-            </p>          
+            </p>
             <p class="text"><%= msg.message %></p>
           </div>
         <%})%>
         <!-- <div class="message">
           <p class="title">
             Fabio Fonseca A. <span>Mayo 17 11:54</span>
-          </p>          
+          </p>
           <p class="text">Hola necesito de tu ayuda!</p>
-        </div>--> 
+        </div>-->
       </div>
       <div class="type-zone">
-        <p id="user" style="display: none"><%= user %></p>
-        <input class="send" id="send" autofocus>          
-        <i class="far fa-smile"></i>     
+        <input class="send" id="send" autofocus>
+        <i class="far fa-smile"></i>
       </div>
     </div>
   </div>
@@ -57,13 +56,20 @@
     $(function () {
       const socket = io();
 
-      socket.on('chat-conection', (state) => {
-        $('#chat').append(`<p class='conected'>${state.conection}</p>`);
-        $('.contacts').append(`<div class="user" id=${state.users[0]}>
+      socket.emit('login', { user: '<%= user %>'});
+
+      socket.on('user-connected', (state) => {
+        $('#chat').append(`<p class='conected'>${state.user} connected</p>`);
+        $('.contacts').append(`<div class="user" id=${state.user}>
             <span class="state"><i class="far fa-circle"></i></span>
-            <p class="name">${state.users[0]}</p>
+            <p class="name">${state.user}</p>
             <i class="fas fa-ellipsis-v"></i>
           </div>`);
+      });
+
+      socket.on('user-disconnected', state => {
+        $('#chat').append(`<p class='conected'>${state.user} disconnected</p>`);
+        $(`#${state.user}`).remove();
       });
 
       $('#send').on('keydown', function(e){
@@ -71,23 +77,18 @@
         if(keycode == '13'){
           const userLogin = $('#user').text();
           let userMessage = $('#send').val();
-          socket.emit('chat-to-server', {message: userMessage, user: userLogin, date: new Date()});
-          $('#send').val('');	
+          socket.emit('new-message', {message: userMessage, user: '<%= user %>', date: new Date()});
+          $('#send').val('');
         }
       });
 
-      socket.on('chat-from-server', (msg) => {
+      socket.on('new-message', msg => {
         $('#chat').append(`<div class='message'>
-        <p class='title'> 
+        <p class='title'>
           ${msg.user}<span>${msg.date}</span>
         </p>
         <p class='text'>${msg.message}</p>
         </div>`);
-      });
-
-      socket.on('user-update', (user)=> {
-        const userid = (`#${user.toDelete}`)
-        $(userid).remove();
       });
 
       return false;

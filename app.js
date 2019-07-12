@@ -11,41 +11,46 @@ app.use(express.static(__dirname));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   secret: 'Ciclismo',
-  maxAge: 10 * 60 * 1000
+  maxAge: 3 * 60 * 1000
 }));
 
 app.locals.users = [];
-const users = app.locals.users;
 app.locals.messages = [];
-const messages = app.locals.messages;
 
 app.get('/', (req, res) => {
   res.render('login');
 });
 
 app.post('/chat', (req, res) => {
-  req.session.userName = req.body.nickname;
   let user = req.body.nickname;
-  res.render('index',{ user, users, messages });
-  users.unshift(user);
+  req.session.userName = user;
+
+  const users = app.locals.users.filter(u => u !== user);
+  res.render('index', { user, users, messages: app.locals.messages });
 })
 
-io.on('connection', (socket) => {
-  let login = {};
-  login[socket.id] = users[0];
-  io.emit('chat-conection', { conection:`${login[socket.id]} is conected`, users:users })
-  console.log('conected: ', socket.id)
+io.on('connection', socket => {
+  let login;
 
-  socket.on('disconnect', () => {
-    io.emit('chat-conection', { conection:`${login[socket.id]} is desconected` });
-    users.splice(users.indexOf(login[socket.id]), 1);
-    io.emit('user-update', { toDelete: login[socket.id] })
+  socket.on('login', data => {
+    const user = data.user;
+    app.locals.users.push(user);
+    login = user;
+
+    socket.broadcast.emit('user-connected', { user: login });
+    console.log('conected: ', login)
   });
 
-  socket.on('chat-to-server', msg => {
-    messages.push(msg);
-    io.emit('chat-from-server', msg);
-  });  
+  socket.on('disconnect', () => {
+    console.log("Disconnected: ", login);
+    app.locals.users.splice(app.locals.users.indexOf(login), 1);
+    io.emit('user-disconnected', { user: login });
+  });
+
+  socket.on('new-message', msg => {
+    app.locals.messages.push(msg);
+    io.emit('new-message', msg);
+  });
 });
 
 http.listen(3000, () => console.log('listening on *:3000'));
