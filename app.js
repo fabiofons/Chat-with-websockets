@@ -7,7 +7,7 @@ const io = require('socket.io')(http);
 const mongoose = require('mongoose');
 const cors = require('cors')
 
-mongoose.connect("mongodb://127.0.0.1:27017/chatbox", { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/chatbox", { useNewUrlParser: true });
 app.use(express.json());
 app.use(express.static(__dirname));
 app.use(cors());
@@ -77,4 +77,6 @@ io.on('connection', socket => {
   });
 });
 
-http.listen(3002, () => console.log('listening on *:3002'));
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => console.log(`Escuchando en el puerto ${PORT} ...`));
+
