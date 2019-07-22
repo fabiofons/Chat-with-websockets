@@ -1,56 +1,80 @@
 const express = require('express');
 const app = express();
-const cookieSession = require('cookie-session');
+const User = require('./model/User');
+const Messages = require('./model/Messages');
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const mongoose = require('mongoose');
+const cors = require('cors')
 
-
-app.set('views', './views');
-app.set('view engine', 'ejs');
+mongoose.connect("mongodb://127.0.0.1:27017/chatbox", { useNewUrlParser: true });
+app.use(express.json());
 app.use(express.static(__dirname));
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieSession({
-  secret: 'Ciclismo',
-  maxAge: 3 * 60 * 1000
-}));
-
-app.locals.users = [];
-app.locals.messages = [];
+app.use(cors());
 
 app.get('/', (req, res) => {
-  res.render('login');
+  res.render('index');
 });
 
-app.post('/chat', (req, res) => {
-  let user = req.body.nickname;
-  req.session.userName = user;
+app.get('/api/users', async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.json(users)
+  } catch(err) {
+    next(err)
+  }
+});
 
-  const users = app.locals.users.filter(u => u !== user);
-  res.render('index', { user, users, messages: app.locals.messages });
-})
+app.post('/api/users', async (req, res, next) => {
+  try {
+    const user = req.body.user;
+    app.locals.user = user;
+    const response = await User.create({user:user})
+    res.status(200).json(response);
+  } catch(err) {
+    next(err);
+  }
+});
+
+app.get('/api/messages', async (req, res, next) => {
+  try {
+    const messages = await Messages.find();
+    res.json(messages);
+  } catch(err) {
+    next(err)
+  }
+});
+
+const dateNow = () => {
+  let months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let d = new Date;
+  let month = months[d.getMonth()];
+  let day = d.getDate();
+  let hour = d.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
+  let fecha = month.concat(" ",day," ",hour);
+  return fecha;
+}
 
 io.on('connection', socket => {
   let login;
 
   socket.on('login', data => {
-    const user = data.user;
-    app.locals.users.push(user);
-    login = user;
-
+    login = data.user;
+    console.log('conected: ', login);
     socket.broadcast.emit('user-connected', { user: login });
-    console.log('conected: ', login)
   });
 
-  socket.on('disconnect', () => {
-    console.log("Disconnected: ", login);
-    app.locals.users.splice(app.locals.users.indexOf(login), 1);
+  socket.on('disconnect', async () => {
+    console.log(login)
+    const response = await User.deleteOne({"user":login});
+    console.log('disconected? ', response);
     io.emit('user-disconnected', { user: login });
   });
 
-  socket.on('new-message', msg => {
-    app.locals.messages.push(msg);
+  socket.on('new-message', async msg => {
+    await Messages.create(msg);
     io.emit('new-message', msg);
   });
 });
 
-http.listen(3000, () => console.log('listening on *:3000'));
+http.listen(3002, () => console.log('listening on *:3002'));
